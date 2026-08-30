@@ -1,16 +1,57 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeClosed, Lock, Mail, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import { Eye, EyeClosed, Lock, Mail, User, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Button from "@/components/button";
 
 export default function SignUp() {
+  const router = useRouter();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const passwordType = passwordVisible ? "text" : "password";
   const confirmType = confirmVisible ? "text" : "password";
+  const passwordMismatch =
+    confirmPassword.length > 0 && password !== confirmPassword;
+  const passwordTooShort = password.length > 0 && password.length < 8;
+
+  const [formError, setFormError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.SubmitEvent) {
+    e.preventDefault();
+    if (password !== confirmPassword) return;
+    if (passwordTooShort) return;
+    setFormError(null);
+    setLoading(true);
+    try {
+      const { data, error } = await authClient.signUp.email({
+        name,
+        email,
+        password,
+      });
+
+      if (error) {
+        setFormError(error.message ?? "Couldn’t create account");
+        return;
+      }
+
+      if (data) {
+        router.push("/");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <main>
@@ -25,13 +66,18 @@ export default function SignUp() {
         </div>
       </section>
       <section>
-        <form className="flex flex-col gap-4 mb-3">
+        <form
+          className="flex flex-col gap-4 mb-3"
+          onSubmit={(e) => handleSubmit(e)}
+        >
           <div className="flex flex-col gap-3">
             <div className="group relative">
               <User className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-muted-text group-focus-within:text-primary" />
               <input
                 type="text"
                 name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your name"
                 autoComplete="name"
                 className="w-full border border-muted-text rounded-lg p-3 pl-12 font-medium text-sm outline-primary focus:border-primary focus:text-black"
@@ -42,6 +88,8 @@ export default function SignUp() {
               <input
                 type="email"
                 name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 autoComplete="email"
                 className="w-full border border-muted-text rounded-lg p-3 pl-12 font-medium text-sm outline-primary focus:border-primary focus:text-black"
@@ -52,6 +100,8 @@ export default function SignUp() {
               <input
                 type={passwordType}
                 name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Create a password"
                 autoComplete="new-password"
                 className="w-full border border-muted-text rounded-lg p-3 pl-12 pr-12 font-medium text-sm outline-primary focus:border-primary focus:text-black"
@@ -69,14 +119,23 @@ export default function SignUp() {
                 )}
               </button>
             </div>
+            {passwordTooShort && (
+              <p className="text-danger text-sm">
+                Password must be at least 8 characters
+              </p>
+            )}
             <div className="group relative">
-              <Lock className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-muted-text group-focus-within:text-primary" />
+              <Lock
+                className={`pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-muted-text ${passwordMismatch ? "group-focus-within:text-danger" : "group-focus-within:text-primary"}`}
+              />
               <input
                 type={confirmType}
                 name="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm your password"
                 autoComplete="new-password"
-                className="w-full border border-muted-text rounded-lg p-3 pl-12 pr-12 font-medium text-sm outline-primary focus:border-primary focus:text-black"
+                className={`w-full border rounded-lg p-3 pl-12 pr-12 font-medium text-sm focus:text-black ${passwordMismatch ? "border-danger outline-danger focus:border-danger" : "border-muted-text outline-primary focus:border-primary"}`}
               />
               <button
                 type="button"
@@ -91,9 +150,19 @@ export default function SignUp() {
                 )}
               </button>
             </div>
+            {passwordMismatch && (
+              <p className="text-danger text-sm">Passwords do not match</p>
+            )}
           </div>
-          <Button variant="black" size="sm" justify="center">
-            Sign up
+          {formError && <p className="text-danger text-sm">{formError}</p>}
+          <Button
+            variant="black"
+            size="sm"
+            justify="center"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? <Loader2 className="animate-spin" /> : "Sign up"}
           </Button>
         </form>
         <div className="flex justify-center bg-muted p-2 rounded-lg w-full">

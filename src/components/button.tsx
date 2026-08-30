@@ -3,6 +3,8 @@ type ButtonProps = {
   variant: "primary" | "black";
   size: "lg" | "md" | "sm";
   justify: "center" | "start" | "end";
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset";
 };
 
 const variantStyles = {
@@ -27,8 +29,14 @@ export default function Button({
   variant,
   size,
   justify,
+  disabled,
+  type,
 }: ButtonProps) {
   const style = `${variantStyles[variant]} ${variantSize[size]} ${textJustify[justify]} rounded-lg transition-colors cursor-pointer flex-1`;
 
-  return <button className={style}>{children}</button>;
+  return (
+    <button type={type} disabled={disabled} className={style}>
+      {children}
+    </button>
+  );
 }

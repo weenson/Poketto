@@ -1,3 +1,24 @@
+"use client";
+
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+
 export default function ProfilePage() {
-  return <h1>Profile</h1>;
+  const router = useRouter();
+
+  async function logOut() {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/login");
+        },
+      },
+    });
+  }
+
+  return (
+    <button className="bg-red p-4" onClick={logOut}>
+      Log Out
+    </button>
+  );
 }
