@@ -1,24 +1,5 @@
-"use client";
-
-import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import LogoutButton from "@/features/profile/components/logout-button";
 
 export default function ProfilePage() {
-  const router = useRouter();
-
-  async function logOut() {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push("/login");
-        },
-      },
-    });
-  }
-
-  return (
-    <button className="bg-red p-4" onClick={logOut}>
-      Log Out
-    </button>
-  );
+  return <LogoutButton />;
 }

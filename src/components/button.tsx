@@ -8,8 +8,8 @@ type ButtonProps = {
 };
 
 const variantStyles = {
-  primary: "bg-primary text-white hover:bg-primary/90 inline-flex items-center",
-  black: "bg-black text-white hover:bg-black/90 inline-flex items-center",
+  primary: "bg-primary text-white hover:bg-primary/90 flex items-center",
+  black: "bg-black text-white hover:bg-black/90 flex items-center",
 };
 
 const variantSize = {
@@ -32,7 +32,7 @@ export default function Button({
   disabled,
   type,
 }: ButtonProps) {
-  const style = `${variantStyles[variant]} ${variantSize[size]} ${textJustify[justify]} rounded-lg transition-colors cursor-pointer flex-1`;
+  const style = `${variantStyles[variant]} ${variantSize[size]} ${textJustify[justify]} rounded-lg transition-colors cursor-pointer w-full`;
 
   return (
     <button type={type} disabled={disabled} className={style}>
