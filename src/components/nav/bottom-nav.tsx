@@ -15,10 +15,10 @@ export default function BottomNav() {
           <Link
             key={href}
             href={href}
-            className={`flex flex-1 flex-col items-center gap-2 py-4  text-muted-text ${pathname === href ? "text-primary bg-linear-to-b from-primary-light/20 to-primary-light/0 border-t border-primary-light rounded-lg" : ""}`}
+            className={`flex flex-1 flex-col items-center gap-2 py-2  text-muted-text ${pathname === href ? "text-primary bg-linear-to-b from-primary-light/20 to-primary-light/0 border-t border-primary-light rounded-lg" : ""}`}
           >
-            <Icon size={25} />
-            <span>{label}</span>
+            <Icon size={18} />
+            <span className="text-sm">{label}</span>
           </Link>
         ))}
       </div>
