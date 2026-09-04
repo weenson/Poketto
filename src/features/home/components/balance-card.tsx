@@ -1,6 +1,12 @@
-import { Eye } from "lucide-react";
+"use client";
 
-export default function BalanceCard() {
+import { Eye } from "lucide-react";
+import { useState } from "react";
+
+export default function BalanceCard({ balance }: { balance: number }) {
+  const [visible, setVisible] = useState(true);
+  const balanceVisibility = visible === true;
+
   return (
     <section className="mt-4">
       {/* Hero Card Decoration*/}
@@ -25,9 +31,11 @@ export default function BalanceCard() {
         <div className="relative flex items-start justify-between gap-4">
           <div>
             <div className="mb-3 h-7 w-10 rounded-md bg-linear-to-br from-white/55 to-white/20 shadow-inner" />
-            <p className="font-medium text-white/75">Total balance</p>
+            <p className="font-medium text-sm text-white/75">Total balance</p>
             <p className="mt-2 text-4xl font-semibold tracking-tight text-white">
-              Rp 1,843,560
+              {balanceVisibility
+                ? `Rp ${balance.toLocaleString("id-Id")}`
+                : "Rp ••••••"}
             </p>
             <p className="mt-2 flex items-center gap-1.5 text-sm text-white/90">
               <span className="rounded-md bg-white/20 px-2 py-1 font-medium backdrop-blur-sm">
@@ -39,6 +47,7 @@ export default function BalanceCard() {
           <button
             className="rounded-full bg-white/15 p-2 text-white backdrop-blur-sm transition hover:bg-white/25"
             aria-label="Toggle balance visibility"
+            onClick={() => setVisible(!visible)}
           >
             <Eye size={20} />
           </button>

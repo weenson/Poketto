@@ -3,7 +3,7 @@
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
-export default function ProfilePage() {
+export default function LogoutButton() {
   const router = useRouter();
 
   async function logOut() {

@@ -13,15 +13,16 @@ datasource db {
 }
 
 model User {
-  id            String    @id
+  id            String        @id
   name          String
-  email         String    @unique
+  email         String        @unique
   emailVerified Boolean
   image         String?
-  createdAt     DateTime  @db.Timestamptz(3)
-  updatedAt     DateTime  @db.Timestamptz(3)
+  createdAt     DateTime      @db.Timestamptz(3)
+  updatedAt     DateTime      @db.Timestamptz(3)
   sessions      Session[]
   accounts      Account[]
+  transactions  Transaction[]
 
   @@map("user")
 }
@@ -72,4 +73,24 @@ model Verification {
 
   @@index([identifier], map: "verification_identifier_idx")
   @@map("verification")
+}
+
+enum TransactionType {
+  EXPENSE
+  INCOME
+}
+
+model Transaction {
+  id        String          @id @default(cuid())
+  userId    String
+  type      TransactionType @default(EXPENSE)
+  category  String
+  amount    Int
+  notes     String?
+  createdAt DateTime        @default(now()) @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@map("transaction")
 }
