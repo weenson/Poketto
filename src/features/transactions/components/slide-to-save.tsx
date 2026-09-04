@@ -1,17 +1,24 @@
 "use client";
 import React, { useState, useRef } from "react";
-import { ChevronsRight } from "lucide-react";
+import { ChevronsRight, Loader2 } from "lucide-react";
 
 type SlideToSaveProps = {
   onSave: () => void;
   disabled?: boolean;
-  label: string;
+  label:
+    | "Slide to save"
+    | "Add amount"
+    | "Add category"
+    | "Add amount & category"
+    | "Saving...";
+  loading?: boolean;
 };
 
 export default function SlideToSave({
   onSave,
   disabled,
   label,
+  loading,
 }: SlideToSaveProps) {
   const THUMB_SIZE = 64;
   const [offset, setOffset] = useState(0);
@@ -26,6 +33,7 @@ export default function SlideToSave({
   }
 
   function handlePointerDown(e: React.PointerEvent) {
+    if (disabled || loading) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     startX.current = e.clientX;
     startOffset.current = offset;
@@ -33,6 +41,7 @@ export default function SlideToSave({
   }
 
   function handlePointerMove(e: React.PointerEvent) {
+    if (disabled || loading) return;
     if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
 
     const delta = e.clientX - startX.current;
@@ -43,31 +52,39 @@ export default function SlideToSave({
   }
 
   function handlePointerUp(e: React.PointerEvent) {
+    if (disabled || loading) return;
     const max = getMaxOffset();
     if (offset >= max) {
       onSave();
+    } else {
+      setOffset(0);
     }
-    setOffset(0);
     setDragging(false);
   }
 
   return (
     <div ref={trackRef} className="relative bg-muted rounded-2xl h-18 w-full">
-      <span className="absolute inset-0 flex items-center justify-center">
+      <span className="absolute inset-0 flex items-center justify-center text-muted-text text-sm">
         {label}
       </span>
+      {!disabled && (
+        <div
+          className="absolute top-1 left-1 h-16 rounded-2xl bg-black/50"
+          style={{ width: offset + THUMB_SIZE }}
+        />
+      )}
       <div
-        className="absolute top-1 left-1 h-16 rounded-2xl bg-black/50"
-        style={{ width: offset + THUMB_SIZE }}
-      />
-      <div
-        className={`absolute bg-black top-1 left-1 h-16 w-16 rounded-2xl text-white flex justify-center items-center touch-none ${dragging ? "" : "transition-transform duration-200 ease-out"}`}
+        className={`absolute ${disabled ? "bg-muted" : "bg-black"} top-1 left-1 h-16 w-16 rounded-2xl text-white flex justify-center items-center touch-none ${dragging ? "" : "transition-transform duration-200 ease-out"}`}
         style={{ transform: `translateX(${offset}px)` }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >
-        <ChevronsRight />
+        {loading ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          !disabled && <ChevronsRight />
+        )}
       </div>
     </div>
   );

@@ -3,17 +3,43 @@ import BalanceCard from "@/features/home/components/balance-card";
 import TransactionList from "@/features/home/components/transaction-list";
 import { BanknoteArrowDown, BanknoteArrowUp } from "lucide-react";
 import Button from "@/components/button";
+import { fetchTransaction, getBalance } from "@/features/transactions/queries";
 import { getSession } from "@/lib/session";
 import { TRANSACTION_ROUTES } from "@/features/transactions/constants";
 import Link from "next/link";
+import { Toaster } from "sonner";
+import SuccessToast from "@/features/home/components/success-toast";
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ success?: string }>;
+}) {
+  const { success } = await searchParams;
   const date = new Date();
   const formattedDate = formatDateToText(date);
-  const session = await getSession();
+
+  const [session, balance, transactions] = await Promise.all([
+    getSession(),
+    getBalance(),
+    fetchTransaction(),
+  ]);
+
+  type TransactionsType = {
+    id: string;
+    createdAt: Date;
+    type: "INCOME" | "EXPENSE";
+    category: string;
+    amount: number;
+    notes: string | null;
+  };
+
   const name = session?.user.name;
+
   return (
     <div>
+      <Toaster position="top-center" richColors duration={2000} />
+      <SuccessToast show={success === "true"} />
       <section>
         <div>
           <p className="text-muted-text text-xs font-bold">{formattedDate}</p>
@@ -39,8 +65,8 @@ export default async function Home() {
         </div>
       </section>
 
-      <BalanceCard />
-      <TransactionList />
+      <BalanceCard balance={balance ?? 0} />
+      <TransactionList transactions={transactions as TransactionsType[]} />
     </div>
   );
 }

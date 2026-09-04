@@ -9,7 +9,7 @@ export function formatDateToText(date: Date) {
 }
 
 export function formatAmount(value: number | null) {
-  if (value === undefined) return "";
+  if (value === null) return "";
   return value?.toLocaleString("id-ID");
 }
 

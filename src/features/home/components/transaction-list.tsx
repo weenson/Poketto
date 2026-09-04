@@ -1,49 +1,24 @@
-import {
-  ChevronRight,
-  BanknoteCheck,
-  ShoppingBag,
-  CircleX,
-} from "lucide-react";
+import { BanknoteCheck, ShoppingBag, CircleX } from "lucide-react";
 
-type Transactions = {
-  id: number;
-  title: string;
-  description: string;
+type TransactionsType = {
+  id: string;
+  category: string;
+  notes: string | null;
   amount: number;
-  date: Date;
-  type: "income" | "expense";
+  createdAt: Date;
+  type: "INCOME" | "EXPENSE";
 };
 
-export const transactions: Transactions[] = [
-  {
-    id: 1,
-    title: "Salary",
-    description: "Monthly salary.",
-    amount: 8000000,
-    date: new Date("2026-08-24"),
-    type: "income",
-  },
-  {
-    id: 2,
-    title: "Groceries",
-    description: "Shopping for groceries.",
-    amount: 500000,
-    date: new Date("2026-08-26"),
-    type: "expense",
-  },
-];
-
-export default function TransactionList() {
+export default async function TransactionList({
+  transactions,
+}: {
+  transactions: TransactionsType[];
+}) {
   return (
     <section className="mt-4">
       <div className="flex items-center justify-between">
         <p className="text-black font-medium">Recent Transactions</p>
-        <p className="flex items-center gap-1">
-          View all{" "}
-          <span>
-            <ChevronRight size={16} />
-          </span>
-        </p>
+        <p className="text-primary text-sm font-bold">See all</p>
       </div>
       <div>
         {transactions.length === 0 ? (
@@ -62,33 +37,28 @@ export default function TransactionList() {
         ) : (
           transactions.map((item) => (
             <div key={item.id} className="mt-4">
-              <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  {item.type === "income" ? (
-                    <div className="bg-success p-4 rounded-full">
-                      <BanknoteCheck className="w-6 h-6 text-white" />
+                  {item.type === "INCOME" ? (
+                    <div className="bg-muted p-4 rounded-2xl">
+                      <BanknoteCheck className="w-6 h-6 text-success" />
                     </div>
                   ) : (
-                    <div className="bg-danger p-4 rounded-full">
-                      <ShoppingBag className="w-6 h-6 text-white" />
+                    <div className="bg-muted p-4 rounded-2xl">
+                      <ShoppingBag className="w-6 h-6 text-danger" />
                     </div>
                   )}
                   <div className="flex flex-col">
-                    <p className="text-black font-medium">{item.title}</p>
-                    <p className="text-muted-text text-sm">
-                      {item.description}
-                    </p>
+                    <p className="text-black font-medium">{item.category}</p>
+                    <p className="text-muted-text text-xs">{item.notes}</p>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-1">
+                <div className="flex items-end gap-1">
                   <p
-                    className={`font-bold text-lg ${item.type === "income" ? "text-success" : "text-danger"}`}
+                    className={`font-bold ${item.type === "INCOME" ? "text-success" : "text-danger"}`}
                   >
-                    {item.type === "income" ? "+" : "-"} Rp{" "}
+                    {item.type === "INCOME" ? "+" : "-"} Rp{" "}
                     {item.amount.toLocaleString()}
-                  </p>
-                  <p className="text-muted-text text-sm">
-                    {item.date.toLocaleDateString()}
                   </p>
                 </div>
               </div>

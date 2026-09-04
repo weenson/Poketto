@@ -11,6 +11,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { TRANSACTION_ROUTES } from "@/features/transactions/constants";
 import SlideToSave from "./slide-to-save";
+import { createTransaction } from "../actions";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 type TransactionFormProps = {
   type: "expense" | "income";
@@ -40,10 +42,6 @@ function GoalThumbnail({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-function handleSave() {
-  console.log("saved");
-}
-
 export default function TransactionForm({
   type,
   heading,
@@ -53,9 +51,20 @@ export default function TransactionForm({
   const [goalsVisible, setGoalsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedGoals, setSelectedGoals] = useState<number | null>(null);
+  const [isPending, setIsPending] = useState(false);
 
-  const allowSaved = (amount !== null && amount > 0) || selectedCategory != "";
-
+  const allowSaved = amount !== null && amount > 0 && selectedCategory != "";
+  const label = () => {
+    if (allowSaved) {
+      return "Slide to save";
+    } else if (amount !== null && amount > 0) {
+      return "Add category";
+    } else if (selectedCategory !== "") {
+      return "Add amount";
+    } else {
+      return "Add amount & category";
+    }
+  };
   const tempGoalsItem = [
     {
       id: 1,
@@ -80,10 +89,33 @@ export default function TransactionForm({
     },
   ];
 
+  function handleCategoryClick(label: string) {
+    if (selectedCategory !== label) {
+      setSelectedCategory(label);
+    } else {
+      setSelectedCategory("");
+    }
+  }
+
+  async function handleSave() {
+    if (amount === null || !selectedCategory) return;
+    setIsPending(true);
+    try {
+      await createTransaction({
+        type: type === "expense" ? "EXPENSE" : "INCOME",
+        category: selectedCategory,
+        amount,
+        notes: notes || undefined,
+      });
+    } catch (error) {
+      if (isRedirectError(error)) throw error;
+      setIsPending(false);
+    }
+  }
   const categories = TRANSACTION_ROUTES[type].transactionCategories;
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
+    <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-3xl flex-col">
       <div className="mb-6 flex items-center gap-3">
         <Link
           href="/"
@@ -131,7 +163,7 @@ export default function TransactionForm({
                       type="button"
                       aria-pressed={selected}
                       className="flex shrink-0 flex-col items-center gap-2 md:shrink"
-                      onClick={() => setSelectedCategory(label)}
+                      onClick={() => handleCategoryClick(label)}
                     >
                       <div
                         className={`flex h-14 w-14 items-center justify-center rounded-2xl ${bgColor}`}
@@ -247,10 +279,16 @@ export default function TransactionForm({
             )}
           </div>
         </aside>
-        <section className="mt-6">
-          <SlideToSave onSave={handleSave} label="Slide to save" />
-        </section>
       </div>
+
+      <section className="mt-auto pt-8">
+        <SlideToSave
+          onSave={handleSave}
+          disabled={!allowSaved}
+          loading={isPending}
+          label={isPending ? "Saving..." : label()}
+        />
+      </section>
     </div>
   );
 }

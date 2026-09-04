@@ -3,7 +3,7 @@
 import { Eye } from "lucide-react";
 import { useState } from "react";
 
-export default function BalanceCard() {
+export default function BalanceCard({ balance }: { balance: number }) {
   const [visible, setVisible] = useState(true);
   const balanceVisibility = visible === true;
 
@@ -33,7 +33,9 @@ export default function BalanceCard() {
             <div className="mb-3 h-7 w-10 rounded-md bg-linear-to-br from-white/55 to-white/20 shadow-inner" />
             <p className="font-medium text-sm text-white/75">Total balance</p>
             <p className="mt-2 text-4xl font-semibold tracking-tight text-white">
-              {balanceVisibility ? "Rp 1,843,560" : "Rp ••••••"}
+              {balanceVisibility
+                ? `Rp ${balance.toLocaleString("id-Id")}`
+                : "Rp ••••••"}
             </p>
             <p className="mt-2 flex items-center gap-1.5 text-sm text-white/90">
               <span className="rounded-md bg-white/20 px-2 py-1 font-medium backdrop-blur-sm">
