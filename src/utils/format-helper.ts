@@ -23,3 +23,7 @@ export function parseAmount(value: string): number | null {
   const digits = value.replace(/\D/g, "");
   return digits ? Number(digits) : null;
 }
+
+export function percentProgress(a: number, b: number): number {
+  return Math.min((a / b) * 100);
+}
