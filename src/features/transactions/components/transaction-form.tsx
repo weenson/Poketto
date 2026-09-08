@@ -6,6 +6,7 @@ import {
   formatAmount,
   formatAmountCompact,
   parseAmount,
+  percentProgress,
 } from "@/utils/format-helper";
 import Link from "next/link";
 import Image from "next/image";
@@ -53,7 +54,7 @@ export default function TransactionForm({
   const [selectedGoals, setSelectedGoals] = useState<number | null>(null);
   const [isPending, setIsPending] = useState(false);
 
-  const allowSaved = amount !== null && amount > 0 && selectedCategory != "";
+  const allowSaved = amount !== null && amount > 0 && selectedCategory !== "";
   const label = () => {
     if (allowSaved) {
       return "Slide to save";
@@ -89,9 +90,9 @@ export default function TransactionForm({
     },
   ];
 
-  function handleCategoryClick(label: string) {
-    if (selectedCategory !== label) {
-      setSelectedCategory(label);
+  function handleCategoryClick(value: string) {
+    if (selectedCategory !== value) {
+      setSelectedCategory(value);
     } else {
       setSelectedCategory("");
     }
@@ -163,7 +164,7 @@ export default function TransactionForm({
                       type="button"
                       aria-pressed={selected}
                       className="flex shrink-0 flex-col items-center gap-2 md:shrink"
-                      onClick={() => handleCategoryClick(label)}
+                      onClick={() => handleCategoryClick(value)}
                     >
                       <div
                         className={`flex h-14 w-14 items-center justify-center rounded-2xl ${bgColor}`}
@@ -223,9 +224,11 @@ export default function TransactionForm({
                 <div className="-mx-1 flex gap-3 overflow-x-auto px-2 py-2 scrollbar-none md:mx-0 md:flex-col md:overflow-visible md:px-0 md:pb-0">
                   {tempGoalsItem.map((goal) => {
                     const selected = selectedGoals === goal.id;
-                    const progress = Math.min(
-                      Math.round((goal.currentAmount / goal.goalAmount) * 100),
+                    const progress = percentProgress(
+                      goal.currentAmount,
+                      goal.goalAmount,
                     );
+
                     const currentLabel =
                       formatAmountCompact(goal.currentAmount) ??
                       goal.currentAmount.toLocaleString("id-ID");

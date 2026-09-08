@@ -15,7 +15,7 @@ const variantStyles = {
 const variantSize = {
   lg: "py-6 px-10",
   md: "py-4 px-6",
-  sm: "py-2 px-4",
+  sm: "py-3 px-4",
 };
 
 const textJustify = {
@@ -32,7 +32,7 @@ export default function Button({
   disabled,
   type,
 }: ButtonProps) {
-  const style = `${variantStyles[variant]} ${variantSize[size]} ${textJustify[justify]} rounded-lg transition-colors cursor-pointer w-full`;
+  const style = `${variantStyles[variant]} ${variantSize[size]} ${textJustify[justify]} rounded-2xl transition-colors cursor-pointer w-full`;
 
   return (
     <button type={type} disabled={disabled} className={style}>

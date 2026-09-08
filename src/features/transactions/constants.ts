@@ -40,7 +40,7 @@ export const TRANSACTION_ROUTES = {
       },
       {
         label: "Fun",
-        value: "entertainment",
+        value: "fun",
         icon: PartyPopper,
         hexColor: "#3B82F6",
         bgColor: "bg-[#3B82F6]",
@@ -89,14 +89,14 @@ export const TRANSACTION_ROUTES = {
       },
       {
         label: "Freelance",
-        value: "Freelance",
+        value: "freelance",
         icon: Computer,
         hexColor: "#3B82F6",
         bgColor: "bg-[#3B82F6]",
       },
       {
         label: "Gifts",
-        value: "Gifts",
+        value: "gifts",
         icon: Gift,
         hexColor: "#EC4899",
         bgColor: "bg-[#EC4899]",

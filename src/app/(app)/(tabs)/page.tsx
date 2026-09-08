@@ -25,20 +25,11 @@ export default async function Home({
     fetchTransaction(),
   ]);
 
-  type TransactionsType = {
-    id: string;
-    createdAt: Date;
-    type: "INCOME" | "EXPENSE";
-    category: string;
-    amount: number;
-    notes: string | null;
-  };
-
   const name = session?.user.name;
 
   return (
     <div>
-      <Toaster position="top-center" richColors duration={2000} />
+      <Toaster position="top-center" richColors />
       <SuccessToast show={success === "true"} />
       <section>
         <div>
@@ -48,7 +39,8 @@ export default async function Home({
           </h1>
           <p className="text-muted-text text-sm">Ready to track your money!</p>
         </div>
-        <div className="flex gap-2 mt-8 w-full">
+        <BalanceCard balance={balance ?? 0} />
+        <div className="flex gap-2 mt-4 w-full">
           <Link href={TRANSACTION_ROUTES.expense.href} className="flex-1">
             <Button variant="black" size="md" justify="center">
               <BanknoteArrowDown className="w-5 h-5 mr-2" />
@@ -65,8 +57,7 @@ export default async function Home({
         </div>
       </section>
 
-      <BalanceCard balance={balance ?? 0} />
-      <TransactionList transactions={transactions as TransactionsType[]} />
+      <TransactionList transactions={transactions} />
     </div>
   );
 }

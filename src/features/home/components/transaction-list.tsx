@@ -1,4 +1,5 @@
-import { BanknoteCheck, ShoppingBag, CircleX } from "lucide-react";
+import { CircleX } from "lucide-react";
+import { TRANSACTION_ROUTES } from "@/features/transactions/constants";
 
 type TransactionsType = {
   id: string;
@@ -35,35 +36,43 @@ export default async function TransactionList({
             </div>
           </div>
         ) : (
-          transactions.map((item) => (
-            <div key={item.id} className="mt-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {item.type === "INCOME" ? (
+          transactions.map((item) => {
+            function getCategory(type: "INCOME" | "EXPENSE", category: string) {
+              const key = type === "INCOME" ? "income" : "expense";
+              return TRANSACTION_ROUTES[key].transactionCategories.find(
+                (c) => c.value === category,
+              );
+            }
+
+            const category = getCategory(item.type, item.category);
+            const Icon = category?.icon;
+            return (
+              <div key={item.id} className="mt-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
                     <div className="bg-muted p-4 rounded-2xl">
-                      <BanknoteCheck className="w-6 h-6 text-success" />
+                      {Icon ? <Icon className="h-6 w-6 text-primary" /> : null}
                     </div>
-                  ) : (
-                    <div className="bg-muted p-4 rounded-2xl">
-                      <ShoppingBag className="w-6 h-6 text-danger" />
+
+                    <div className="flex flex-col">
+                      <p className="text-black font-medium">
+                        {category?.label}
+                      </p>
+                      <p className="text-muted-text text-xs">{item.notes}</p>
                     </div>
-                  )}
-                  <div className="flex flex-col">
-                    <p className="text-black font-medium">{item.category}</p>
-                    <p className="text-muted-text text-xs">{item.notes}</p>
+                  </div>
+                  <div className="flex items-end gap-1">
+                    <p
+                      className={`font-bold ${item.type === "INCOME" ? "text-success" : "text-danger"}`}
+                    >
+                      {item.type === "INCOME" ? "+" : "-"} Rp{" "}
+                      {item.amount.toLocaleString()}
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-end gap-1">
-                  <p
-                    className={`font-bold ${item.type === "INCOME" ? "text-success" : "text-danger"}`}
-                  >
-                    {item.type === "INCOME" ? "+" : "-"} Rp{" "}
-                    {item.amount.toLocaleString()}
-                  </p>
-                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </section>
