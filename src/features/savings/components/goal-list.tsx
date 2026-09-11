@@ -2,7 +2,7 @@ import { CircleX, PiggyBank } from "lucide-react";
 import { formatAmountCompact, percentProgress } from "@/utils/format-helper";
 
 export type SavingsGoal = {
-  id: number;
+  id: string;
   name: string;
   goalAmount: number;
   currentAmount: number;

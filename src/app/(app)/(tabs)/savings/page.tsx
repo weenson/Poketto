@@ -3,8 +3,17 @@ import { Goal, TrendingUp } from "lucide-react";
 import GoalList from "@/features/savings/components/goal-list";
 import HeroCard from "@/features/savings/components/hero-card";
 import Link from "next/link";
+import { Toaster } from "sonner";
+import SuccessToast from "@/features/home/components/success-toast";
+import { getSavingsGoals } from "@/features/savings/queries";
 
-export default function SavingsPage() {
+export default async function SavingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ success?: string }>;
+}) {
+  const { success } = await searchParams;
+  const goals = await getSavingsGoals();
   const tempGoalsItem = [
     {
       id: 1,
@@ -31,6 +40,12 @@ export default function SavingsPage() {
 
   return (
     <>
+      <Toaster position="top-center" richColors />
+      <SuccessToast
+        show={success === "true"}
+        link={"/savings"}
+        title={"Goals created"}
+      />
       <section>
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-2xl font-bold">My Savings </h1>
@@ -67,7 +82,7 @@ export default function SavingsPage() {
           </div>
         </div>
       </section>
-      <GoalList goals={tempGoalsItem} />
+      <GoalList goals={goals ?? []} />
     </>
   );
 }

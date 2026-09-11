@@ -23,6 +23,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   transactions  Transaction[]
+  savings       Savings[]
 
   @@map("user")
 }
@@ -83,14 +84,41 @@ enum TransactionType {
 model Transaction {
   id        String          @id @default(cuid())
   userId    String
+  savingsId String?
   type      TransactionType @default(EXPENSE)
   category  String
   amount    Int
   notes     String?
   createdAt DateTime        @default(now()) @db.Timestamptz(3)
 
-  user User @relation(fields: [userId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
+  savings Savings? @relation(fields: [savingsId], references: [id])
 
   @@index([userId, createdAt])
+  @@index([savingsId])
   @@map("transaction")
+}
+
+enum SavingStatus {
+  ACTIVE
+  COMPLETED
+  ON_HOLD
+}
+
+model Savings {
+  id         String       @id @default(cuid())
+  userId     String
+  title      String
+  goalAmount Int
+  status     SavingStatus @default(ACTIVE)
+  endDate    DateTime?    @db.Timestamptz(3)
+  imageUrl   String?
+  createdAt  DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime     @updatedAt @db.Timestamptz(3)
+
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+
+  @@index([userId])
+  @@map("savings")
 }

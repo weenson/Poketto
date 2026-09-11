@@ -3,28 +3,31 @@
 import { ImagePlus, X } from "lucide-react";
 import { useState, useEffect } from "react";
 
-export default function ImageUpload() {
-  const [preview, setPreview] = useState<string | null>(null);
-
+type ImageUploadProps = {
+  value: string | null;
+  onChange: (url: string | null) => void;
+};
+export default function ImageUpload({ value, onChange }: ImageUploadProps) {
+  const previewUrl = value?.startsWith("blob:");
   useEffect(() => {
     return () => {
-      if (preview) URL.revokeObjectURL(preview);
+      if (previewUrl && value) URL.revokeObjectURL(value);
     };
-  }, [preview]);
+  }, [value]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith("image/")) return;
 
-    if (preview) URL.revokeObjectURL(preview);
-    setPreview(URL.createObjectURL(file));
+    if (previewUrl && value) URL.revokeObjectURL(value);
+    onChange(URL.createObjectURL(file));
   }
 
   function removeImage(e: React.MouseEvent) {
     e.preventDefault();
 
-    if (preview) URL.revokeObjectURL(preview);
-    setPreview(null);
+    if (previewUrl && value) URL.revokeObjectURL(value);
+    onChange(null);
   }
   return (
     <div>
@@ -33,10 +36,10 @@ export default function ImageUpload() {
         htmlFor="goal-image"
         className="flex aspect-square w-32 cursor-pointer items-center justify-center overflow-hidden rounded-2xl bg-white border-3 border-muted border-dashed border-rounded"
       >
-        {preview ? (
+        {value ? (
           <div className="group relative h-full w-full">
             <img
-              src={preview}
+              src={value}
               alt="Goal preview"
               className="h-full w-full object-cover"
             />
