@@ -1,5 +1,6 @@
 import { CircleX } from "lucide-react";
 import { TRANSACTION_ROUTES } from "@/features/transactions/constants";
+import { Goal } from "lucide-react";
 
 type TransactionsType = {
   id: string;
@@ -8,6 +9,10 @@ type TransactionsType = {
   amount: number;
   createdAt: Date;
   type: "INCOME" | "EXPENSE";
+  savings: {
+    id: string;
+    title: string;
+  } | null;
 };
 
 export default async function TransactionList({
@@ -37,15 +42,29 @@ export default async function TransactionList({
           </div>
         ) : (
           transactions.map((item) => {
-            function getCategory(type: "INCOME" | "EXPENSE", category: string) {
-              const key = type === "INCOME" ? "income" : "expense";
-              return TRANSACTION_ROUTES[key].transactionCategories.find(
-                (c) => c.value === category,
-              );
-            }
-
-            const category = getCategory(item.type, item.category);
+            const key = item.type === "INCOME" ? "income" : "expense";
+            const category = TRANSACTION_ROUTES[key].transactionCategories.find(
+              (c) => c.value === item.category,
+            );
             const Icon = category?.icon;
+
+            const typeStyle =
+              item.type === "INCOME"
+                ? {
+                    amountClass: "text-success",
+                    sign: "+",
+                    goalGradient: "from-primary/15 to-primary/0",
+                    goalIconClass: "text-primary",
+                    goalLabel: "Added to",
+                  }
+                : {
+                    amountClass: "text-danger",
+                    sign: "-",
+                    goalGradient: "from-danger/15 to-danger/0",
+                    goalIconClass: "text-danger",
+                    goalLabel: "Deducted from",
+                  };
+
             return (
               <div key={item.id} className="mt-4">
                 <div className="flex items-center justify-between">
@@ -62,14 +81,33 @@ export default async function TransactionList({
                     </div>
                   </div>
                   <div className="flex items-end gap-1">
-                    <p
-                      className={`font-bold ${item.type === "INCOME" ? "text-success" : "text-danger"}`}
-                    >
-                      {item.type === "INCOME" ? "+" : "-"} Rp{" "}
-                      {item.amount.toLocaleString()}
+                    <p className={`font-bold ${typeStyle.amountClass}`}>
+                      {typeStyle.sign} Rp {item.amount.toLocaleString()}
                     </p>
                   </div>
                 </div>
+                {item.savings && (
+                  <div className="mt-2">
+                    <div
+                      className={`bg-linear-to-r rounded-2xl px-4 py-2 ${typeStyle.goalGradient}`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <Goal
+                          className={`w-4 h-4 ${typeStyle.goalIconClass}`}
+                        />{" "}
+                        <div className="text-xs line-clamp-1">
+                          <span className="font-semibold">
+                            Rp {item.amount.toLocaleString()}
+                          </span>{" "}
+                          - {typeStyle.goalLabel} -{" "}
+                          <span className="font-semibold">
+                            {item.savings.title}
+                          </span>
+                        </div>
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })
