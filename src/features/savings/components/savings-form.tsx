@@ -8,16 +8,29 @@ import {
   parseAmount,
   formatDateForInput,
 } from "@/utils/format-helper";
-import { createGoals } from "@/features/savings/actions";
+import { createGoals, updateGoals } from "@/features/savings/actions";
 import ImageUpload from "./image-upload";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
-export default function SavingsForm() {
-  const [title, setTitle] = useState("");
-  const [goalAmount, setGoalAmount] = useState<number | null>(null);
-  const [deadline, setDeadline] = useState<Date | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+type SavingsFormProps = {
+  mode: "create" | "edit";
+  goal?: {
+    id: string;
+    title: string;
+    goalAmount: number;
+    endDate: Date | null;
+    imageUrl: string | null;
+  };
+};
+
+export default function SavingsForm({ mode, goal }: SavingsFormProps) {
+  const [title, setTitle] = useState(goal?.title ?? "");
+  const [goalAmount, setGoalAmount] = useState(goal?.goalAmount ?? 0);
+  const [deadline, setDeadline] = useState(goal?.endDate ?? null);
+  const [imageUrl, setImageUrl] = useState(goal?.imageUrl ?? "");
   const [loading, setLoading] = useState(false);
+
+  const buttonText = mode === "create" ? "Save" : "Update";
 
   async function handleSave() {
     if (!title || !goalAmount || !deadline) {
@@ -25,12 +38,21 @@ export default function SavingsForm() {
     }
     setLoading(true);
     try {
-      await createGoals({
-        title,
-        goalAmount,
-        endDate: deadline,
-        imageUrl: undefined,
-      });
+      if (mode === "create") {
+        await createGoals({
+          title,
+          goalAmount,
+          endDate: deadline,
+          imageUrl: undefined,
+        });
+      } else {
+        await updateGoals(goal?.id ?? "", {
+          title,
+          goalAmount,
+          endDate: deadline,
+          imageUrl: undefined,
+        });
+      }
     } catch (error) {
       if (isRedirectError(error)) throw error;
       setLoading(false);
@@ -40,7 +62,10 @@ export default function SavingsForm() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex text-center justify-center">
-        <ImageUpload value={imageUrl} onChange={setImageUrl} />
+        <ImageUpload
+          value={imageUrl}
+          onChange={(url) => setImageUrl(url ?? "")}
+        />
       </div>
       <div className="relative">
         <Goal className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-text" />
@@ -60,7 +85,7 @@ export default function SavingsForm() {
           type="text"
           inputMode="numeric"
           value={formatAmount(goalAmount)}
-          onChange={(e) => setGoalAmount(parseAmount(e.target.value))}
+          onChange={(e) => setGoalAmount(parseAmount(e.target.value) ?? 0)}
           placeholder="Amount"
           className="w-full border border-muted-text rounded-2xl p-3 pl-12 font-medium text-sm"
         />
@@ -91,7 +116,7 @@ export default function SavingsForm() {
         disabled={loading}
         onClick={handleSave}
       >
-        Create
+        {buttonText}
       </Button>
     </div>
   );

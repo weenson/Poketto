@@ -28,5 +28,24 @@ export async function createGoals(data: goalProps) {
   });
 
   revalidatePath("/savings");
-  redirect("/savings?success=true");
+  redirect("/savings?success=created");
+}
+
+export async function updateGoals(id: string, data: goalProps) {
+  const session = await getSession();
+
+  if (!session) throw new Error("Unauthorized");
+
+  await prisma.savings.update({
+    where: { id, userId: session.user.id },
+    data: {
+      title: data.title,
+      goalAmount: data.goalAmount,
+      endDate: data.endDate,
+      imageUrl: data.imageUrl,
+    },
+  });
+
+  revalidatePath("/savings");
+  redirect("/savings?success=updated");
 }

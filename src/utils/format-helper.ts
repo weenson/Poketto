@@ -24,8 +24,7 @@ export function formatAmount(value: number | null) {
 }
 
 export function formatAmountCompact(value: number) {
-  if (value >= 1000000) return `${(value / 1000000).toFixed(1)}m`;
-  if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+  if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
   return value.toLocaleString("id-ID");
 }
 

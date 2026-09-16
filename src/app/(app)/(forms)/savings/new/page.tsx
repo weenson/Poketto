@@ -6,7 +6,7 @@ export default function SavingsNewForm() {
     <div>
       <h1 className="text-2xl font-bold text-center">Create Goal</h1>
       <section className="mt-4">
-        <SavingsForm />
+        <SavingsForm mode="create" />
       </section>
     </div>
   );
