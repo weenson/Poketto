@@ -10,6 +10,7 @@ type SlideToSaveProps = {
     | "Add amount"
     | "Add category"
     | "Add amount & category"
+    | "Exceeded goal balance"
     | "Saving...";
   loading?: boolean;
 };
