@@ -4,15 +4,21 @@ import { toast } from "sonner";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-export default function SuccessToast({ show }: { show: boolean }) {
+type SuccessToastProps = {
+  show: boolean;
+  link: string;
+  title: string;
+};
+
+export default function SuccessToast({ show, link, title }: SuccessToastProps) {
   const shown = useRef(false);
 
   const router = useRouter();
   useEffect(() => {
     if (!show || shown.current) return;
-    toast.success("Transaction saved");
+    toast.success(title);
     shown.current = true; // Prevent toast from showing twice in dev.
-    router.replace("/");
+    router.replace(link);
   }, [show, router]);
 
   return null;

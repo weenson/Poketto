@@ -5,6 +5,7 @@ type ButtonProps = {
   justify: "center" | "start" | "end";
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
+  onClick?: () => void;
 };
 
 const variantStyles = {
@@ -31,11 +32,12 @@ export default function Button({
   justify,
   disabled,
   type,
+  onClick,
 }: ButtonProps) {
   const style = `${variantStyles[variant]} ${variantSize[size]} ${textJustify[justify]} rounded-2xl transition-colors cursor-pointer w-full`;
 
   return (
-    <button type={type} disabled={disabled} className={style}>
+    <button type={type} disabled={disabled} className={style} onClick={onClick}>
       {children}
     </button>
   );

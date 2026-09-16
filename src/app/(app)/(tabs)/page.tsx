@@ -30,7 +30,11 @@ export default async function Home({
   return (
     <div>
       <Toaster position="top-center" richColors />
-      <SuccessToast show={success === "true"} />
+      <SuccessToast
+        show={success === "true"}
+        link={"/"}
+        title={"Transaction Saved"}
+      />
       <section>
         <div>
           <p className="text-muted-text text-xs font-bold">{formattedDate}</p>

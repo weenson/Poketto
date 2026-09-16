@@ -1,11 +1,13 @@
 import { CircleX, PiggyBank } from "lucide-react";
 import { formatAmountCompact, percentProgress } from "@/utils/format-helper";
+import Link from "next/link";
 
 export type SavingsGoal = {
-  id: number;
+  id: string;
   name: string;
   goalAmount: number;
   currentAmount: number;
+  imageUrl?: string;
 };
 
 export default function GoalList({ goals }: { goals: SavingsGoal[] }) {
@@ -37,31 +39,33 @@ export default function GoalList({ goals }: { goals: SavingsGoal[] }) {
             );
 
             return (
-              <div key={item.id} className="mt-4 flex items-start gap-2">
-                <div className="bg-muted p-4 rounded-2xl">
-                  <PiggyBank className="h-6 w-6 text-primary" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-black font-medium">{item.name}</p>
-                      <p className="text-muted-text text-xs">
-                        Rp {formatAmountCompact(item.currentAmount)} of Rp{" "}
-                        {formatAmountCompact(item.goalAmount)}
+              <Link href={`/savings/${item.id}/edit`} key={item.id}>
+                <div key={item.id} className="mt-4 flex items-start gap-2">
+                  <div className="bg-muted p-4 rounded-2xl">
+                    <PiggyBank className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-black font-medium">{item.name}</p>
+                        <p className="text-muted-text text-xs">
+                          Rp {formatAmountCompact(item.currentAmount)} of Rp{" "}
+                          {formatAmountCompact(item.goalAmount)}
+                        </p>
+                      </div>
+                      <p className="shrink-0 font-bold text-primary">
+                        {Math.round(progress)}%
                       </p>
                     </div>
-                    <p className="shrink-0 font-bold text-primary">
-                      {Math.round(progress)}%
-                    </p>
-                  </div>
-                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-primary"
-                      style={{ width: `${progress}%` }}
-                    />
+                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-primary"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })
         )}

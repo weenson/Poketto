@@ -17,6 +17,12 @@ export async function fetchTransaction() {
       amount: true,
       notes: true,
       createdAt: true,
+      savings: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",

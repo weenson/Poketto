@@ -1,63 +1,54 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, PiggyBank, ChevronLeft } from "lucide-react";
-import {
-  formatAmount,
-  formatAmountCompact,
-  parseAmount,
-  percentProgress,
-} from "@/utils/format-helper";
+import { Pencil, ChevronLeft } from "lucide-react";
+import { formatAmount, parseAmount } from "@/utils/format-helper";
 import Link from "next/link";
-import Image from "next/image";
 import { TRANSACTION_ROUTES } from "@/features/transactions/constants";
 import SlideToSave from "./slide-to-save";
 import { createTransaction } from "../actions";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
+import GoalCard from "./goal-card";
+import { SavingsGoal } from "@/features/savings/components/goal-list";
 
 type TransactionFormProps = {
   type: "expense" | "income";
   heading: string;
+  goals?: SavingsGoal[];
 };
-
-function GoalThumbnail({ src, alt }: { src: string; alt: string }) {
-  const [failed, setFailed] = useState(false);
-
-  if (!src || failed) {
-    return (
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary">
-        <PiggyBank className="h-5 w-5 text-white" />
-      </div>
-    );
-  }
-
-  return (
-    <Image
-      src={src}
-      alt={alt}
-      className="h-11 w-11 shrink-0 rounded-xl object-cover"
-      width={44}
-      height={44}
-      onError={() => setFailed(true)}
-    />
-  );
-}
 
 export default function TransactionForm({
   type,
   heading,
+  goals,
 }: TransactionFormProps) {
   const [amount, setAmount] = useState<number | null>(null);
   const [notes, setNotes] = useState("");
   const [goalsVisible, setGoalsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedGoals, setSelectedGoals] = useState<number | null>(null);
+  const [selectedGoals, setSelectedGoals] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
-  const allowSaved = amount !== null && amount > 0 && selectedCategory !== "";
+  const selectedGoal = goals?.find((g) => g.id === selectedGoals);
+  const exceedGoal =
+    type === "expense" &&
+    goalsVisible &&
+    selectedGoal != null &&
+    amount != null &&
+    amount > selectedGoal.currentAmount;
+
+  const goalDifference = () => {
+    if (amount === null || selectedGoal?.currentAmount === undefined) return;
+    return amount - selectedGoal.currentAmount;
+  };
+
+  const allowSaved =
+    amount !== null && amount > 0 && selectedCategory !== "" && !exceedGoal;
   const label = () => {
     if (allowSaved) {
       return "Slide to save";
+    } else if (exceedGoal) {
+      return "Exceeded goal balance";
     } else if (amount !== null && amount > 0) {
       return "Add category";
     } else if (selectedCategory !== "") {
@@ -66,29 +57,6 @@ export default function TransactionForm({
       return "Add amount & category";
     }
   };
-  const tempGoalsItem = [
-    {
-      id: 1,
-      name: "Buy a new laptop",
-      goalAmount: 13000000,
-      currentAmount: 2500000,
-      imageUrl: "",
-    },
-    {
-      id: 2,
-      name: "Travel to Japan",
-      goalAmount: 40000000,
-      currentAmount: 1200000,
-      imageUrl: "",
-    },
-    {
-      id: 3,
-      name: "Buy Cimol",
-      goalAmount: 12000,
-      currentAmount: 1000,
-      imageUrl: "",
-    },
-  ];
 
   function handleCategoryClick(value: string) {
     if (selectedCategory !== value) {
@@ -99,7 +67,7 @@ export default function TransactionForm({
   }
 
   async function handleSave() {
-    if (amount === null || !selectedCategory) return;
+    if (amount === null || !selectedCategory || exceedGoal) return;
     setIsPending(true);
     try {
       await createTransaction({
@@ -107,6 +75,7 @@ export default function TransactionForm({
         category: selectedCategory,
         amount,
         notes: notes || undefined,
+        savingsId: selectedGoals ?? undefined,
       });
     } catch (error) {
       if (isRedirectError(error)) throw error;
@@ -146,10 +115,15 @@ export default function TransactionForm({
                 inputMode="numeric"
                 value={formatAmount(amount)}
                 onChange={(e) => setAmount(parseAmount(e.target.value))}
-                className="w-full rounded-2xl bg-muted py-5 pr-5 pl-14 text-xl font-bold tabular-nums outline-none focus:ring-2 focus:ring-primary/30 md:py-6 md:text-3xl"
+                className={`w-full rounded-2xl bg-muted py-5 pr-5 pl-14 text-xl font-bold tabular-nums outline-none border-2 border-muted md:py-6 md:text-3xl ${exceedGoal ? "border border-red-500" : ""}`}
                 placeholder="0"
               />
             </div>
+            {exceedGoal && (
+              <p className="text-sm text-red-500 mt-2">
+                {formatAmount(goalDifference() ?? 0)} over goal balance
+              </p>
+            )}
           </section>
 
           <section>
@@ -157,7 +131,7 @@ export default function TransactionForm({
             <div className="-mx-1 flex gap-3 overflow-x-auto px-1 py-2 scrollbar-none sm:gap-4 md:grid md:grid-cols-3 md:overflow-visible md:py-0 lg:grid-cols-6">
               {categories.map(
                 ({ icon: Icon, label, value, bgColor, hexColor }) => {
-                  const selected = selectedCategory === label;
+                  const selected = selectedCategory === value;
                   return (
                     <button
                       key={value}
@@ -220,59 +194,11 @@ export default function TransactionForm({
             </div>
 
             {goalsVisible && (
-              <div className="flex flex-col gap-3 md:gap-3">
-                <div className="-mx-1 flex gap-3 overflow-x-auto px-2 py-2 scrollbar-none md:mx-0 md:flex-col md:overflow-visible md:px-0 md:pb-0">
-                  {tempGoalsItem.map((goal) => {
-                    const selected = selectedGoals === goal.id;
-                    const progress = percentProgress(
-                      goal.currentAmount,
-                      goal.goalAmount,
-                    );
-
-                    const currentLabel =
-                      formatAmountCompact(goal.currentAmount) ??
-                      goal.currentAmount.toLocaleString("id-ID");
-                    const goalLabel =
-                      formatAmountCompact(goal.goalAmount) ??
-                      goal.goalAmount.toLocaleString("id-ID");
-
-                    return (
-                      <button
-                        type="button"
-                        key={goal.id}
-                        onClick={() => setSelectedGoals(goal.id)}
-                        className={`w-full shrink-0 rounded-2xl bg-white p-4 text-left transition md:shrink md:w-auto ${
-                          selected ? "ring-2 ring-black" : "hover:bg-white/80"
-                        } min-w-60 md:min-w-0`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <GoalThumbnail src={goal.imageUrl} alt={goal.name} />
-                          <div className="min-w-0 flex-1">
-                            <h3 className="truncate font-medium">
-                              {goal.name}
-                            </h3>
-                            <p className="mt-0.5 text-sm tabular-nums text-muted-text">
-                              Rp {currentLabel}{" "}
-                              <span className="text-primary">
-                                / Rp {goalLabel}
-                              </span>
-                            </p>
-                          </div>
-                        </div>
-                        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
-                          <div
-                            className="h-full rounded-full bg-primary transition-all"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                        <p className="mt-1 text-right text-xs text-muted-text">
-                          {progress}%
-                        </p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              <GoalCard
+                goals={goals ?? []}
+                selectedGoals={selectedGoals ?? ""}
+                setSelectedGoals={setSelectedGoals}
+              />
             )}
 
             {!goalsVisible && (

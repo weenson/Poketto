@@ -9,13 +9,17 @@ body {
 
 @theme  {
   --color-background: #f7f8f4;
-  --color-primary: #4f8068;
+  /* --color-primary: #4f8068;
   --color-primary-dark: #3a624c;
-  --color-primary-light: #61ca62;
+  --color-primary-light: #61ca62; */
+  --color-primary: #1fcd9f;
+  --color-primary-dark: #19a684;
+  --color-primary-light: #50d9a8;
   --color-black: #222222;
   --color-muted: #e7e7e7;
   --color-muted-text: #7d857e;
-  --color-success: #61ca62;
+  --color-success: #1fcd9f;
+  /* --color-success: #61ca62; */
   --color-danger: #ff4d4f;
 }
 

@@ -3,6 +3,7 @@ import {
   TRANSACTION_ROUTES,
   TransactionRoutesType,
 } from "@/features/transactions/constants";
+import { getSavingsGoals } from "@/features/savings/queries";
 import { notFound } from "next/navigation";
 
 export default async function TransactionPage({
@@ -17,6 +18,13 @@ export default async function TransactionPage({
   }
 
   const config = TRANSACTION_ROUTES[type as TransactionRoutesType];
+  const goals = await getSavingsGoals();
 
-  return <TransactionForm type={config.dbType} heading={config.heading} />;
+  return (
+    <TransactionForm
+      type={config.dbType}
+      heading={config.heading}
+      goals={goals ?? []}
+    />
+  );
 }

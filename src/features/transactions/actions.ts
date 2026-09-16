@@ -10,6 +10,7 @@ type TransactionProps = {
   category: string;
   amount: number;
   notes?: string;
+  savingsId?: string;
 };
 
 export async function createTransaction(data: TransactionProps) {
@@ -31,6 +32,30 @@ export async function createTransaction(data: TransactionProps) {
     throw new Error("Invalid transaction type");
   }
 
+  if (data.type === "EXPENSE" && data.savingsId) {
+    const goal = await prisma.savings.findFirst({
+      where: { id: data.savingsId, userId: session.user.id },
+      select: { id: true },
+    });
+    if (!goal) throw new Error("Goal not found");
+
+    const total = await prisma.transaction.groupBy({
+      by: ["type"],
+      where: { userId: session.user.id, savingsId: goal.id },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    const income = total.find((t) => t.type === "INCOME")?._sum.amount ?? 0;
+    const expense = total.find((t) => t.type === "EXPENSE")?._sum.amount ?? 0;
+
+    const balance = income - expense;
+    if (data.amount > balance) {
+      throw new Error("Amount exceeds goal balance");
+    }
+  }
+
   await prisma.transaction.create({
     data: {
       userId: session.user.id,
@@ -38,6 +63,7 @@ export async function createTransaction(data: TransactionProps) {
       category: data.category,
       amount: data.amount,
       notes: data.notes,
+      savingsId: data.savingsId,
     },
   });
 

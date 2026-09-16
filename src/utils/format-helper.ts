@@ -8,14 +8,23 @@ export function formatDateToText(date: Date) {
     .toUpperCase();
 }
 
+export function formatDateForInput(date: Date | null) {
+  if (!date) return "";
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 export function formatAmount(value: number | null) {
   if (value === null) return "";
   return value?.toLocaleString("id-ID");
 }
 
 export function formatAmountCompact(value: number) {
-  if (value >= 1000000) return `${(value / 1000000).toFixed(1)}m`;
-  if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+  if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
   return value.toLocaleString("id-ID");
 }
 
