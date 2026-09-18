@@ -9,11 +9,12 @@ export async function getSavingsGoals() {
 
   const goals = await prisma.savings.findMany({
     take: 10,
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, status: "ACTIVE" },
     select: {
       id: true,
       title: true,
       goalAmount: true,
+      endDate: true,
       imageUrl: true,
     },
   });
@@ -44,15 +45,16 @@ export async function getSavingsGoals() {
     goalAmount: goal.goalAmount,
     currentAmount:
       (incomeById.get(goal.id) ?? 0) - (expenseById.get(goal.id) ?? 0),
+    endDate: goal.endDate,
   }));
 }
 
 export async function getSavingsGoalById(id: string) {
   const session = await getSession();
-  if (!session) return;
+  if (!session) throw new Error("Unauthorized");
 
-  return prisma.savings.findFirst({
-    where: { userId: session.user.id, id: id },
+  const savings = await prisma.savings.findFirst({
+    where: { userId: session.user.id, id: id, status: "ACTIVE" },
     select: {
       id: true,
       title: true,
@@ -61,6 +63,30 @@ export async function getSavingsGoalById(id: string) {
       endDate: true,
     },
   });
+
+  const transactions = await prisma.transaction.groupBy({
+    by: ["type"],
+    where: {
+      userId: session.user.id,
+      savingsId: id,
+    },
+    _sum: { amount: true },
+  });
+
+  const currentAmount =
+    (transactions.find((t) => t.type === "INCOME")?._sum.amount ?? 0) -
+    (transactions.find((t) => t.type === "EXPENSE")?._sum.amount ?? 0);
+
+  if (!savings) throw new Error("Goal not found");
+
+  return {
+    id: savings.id,
+    name: savings.title,
+    goalAmount: savings.goalAmount,
+    endDate: savings.endDate,
+    imageUrl: savings.imageUrl,
+    currentAmount,
+  };
 }
 
 export async function getTotalSavings() {

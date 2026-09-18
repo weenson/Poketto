@@ -49,3 +49,19 @@ export async function updateGoals(id: string, data: goalProps) {
   revalidatePath("/savings");
   redirect("/savings?success=updated");
 }
+
+export async function inactivateGoals(id: string) {
+  const session = await getSession();
+
+  if (!session) throw new Error("Unauthorized");
+
+  await prisma.savings.update({
+    where: { id, userId: session.user.id },
+    data: {
+      status: "INACTIVE",
+    },
+  });
+
+  revalidatePath("/savings");
+  redirect("/savings?success=deleted");
+}

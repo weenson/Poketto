@@ -103,6 +103,7 @@ enum SavingStatus {
   ACTIVE
   COMPLETED
   ON_HOLD
+  INACTIVE
 }
 
 model Savings {
