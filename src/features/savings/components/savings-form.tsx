@@ -16,7 +16,7 @@ type SavingsFormProps = {
   mode: "create" | "edit";
   goal?: {
     id: string;
-    title: string;
+    name: string;
     goalAmount: number;
     endDate: Date | null;
     imageUrl: string | null;
@@ -24,7 +24,7 @@ type SavingsFormProps = {
 };
 
 export default function SavingsForm({ mode, goal }: SavingsFormProps) {
-  const [title, setTitle] = useState(goal?.title ?? "");
+  const [name, setName] = useState(goal?.name ?? "");
   const [goalAmount, setGoalAmount] = useState(goal?.goalAmount ?? 0);
   const [deadline, setDeadline] = useState(goal?.endDate ?? null);
   const [imageUrl, setImageUrl] = useState(goal?.imageUrl ?? "");
@@ -33,21 +33,21 @@ export default function SavingsForm({ mode, goal }: SavingsFormProps) {
   const buttonText = mode === "create" ? "Save" : "Update";
 
   async function handleSave() {
-    if (!title || !goalAmount || !deadline) {
+    if (!name || !goalAmount || !deadline) {
       return;
     }
     setLoading(true);
     try {
       if (mode === "create") {
         await createGoals({
-          title,
+          title: name,
           goalAmount,
           endDate: deadline,
           imageUrl: undefined,
         });
       } else {
         await updateGoals(goal?.id ?? "", {
-          title,
+          title: name,
           goalAmount,
           endDate: deadline,
           imageUrl: undefined,
@@ -71,9 +71,9 @@ export default function SavingsForm({ mode, goal }: SavingsFormProps) {
         <Goal className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-text" />
         <input
           type="text"
-          placeholder="Goal title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Goal name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           className="w-full border border-muted-text rounded-2xl p-3 pl-12 font-medium text-sm"
         />
       </div>

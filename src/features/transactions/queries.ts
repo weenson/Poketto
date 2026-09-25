@@ -30,6 +30,23 @@ export async function fetchTransaction() {
   });
 }
 
+export async function fetchTransactionById(id: string) {
+  const session = await getSession();
+  if (!session) throw new Error("Unauthorized");
+  return prisma.transaction.findMany({
+    where: { userId: session.user.id, savingsId: id },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      type: true,
+      category: true,
+      amount: true,
+      notes: true,
+      createdAt: true,
+    },
+  });
+}
+
 export async function getBalance() {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");

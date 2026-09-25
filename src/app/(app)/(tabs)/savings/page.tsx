@@ -20,9 +20,19 @@ export default async function SavingsPage({
     <>
       <Toaster position="top-center" richColors />
       <SuccessToast
-        show={success === "created" || success === "updated"}
+        show={
+          success === "created" ||
+          success === "updated" ||
+          success === "deleted"
+        }
         link={"/savings"}
-        title={success === "created" ? "Goals created" : "Goals updated"}
+        title={
+          success === "created"
+            ? "Goals created"
+            : success === "updated"
+              ? "Goals updated"
+              : "Goals deleted"
+        }
       />
       <section>
         <div className="flex flex-row justify-between items-center">
@@ -37,8 +47,8 @@ export default async function SavingsPage({
           </div>
         </div>
         <HeroCard total={total ?? 0} />
+        <GoalList goals={goals ?? []} />
       </section>
-      <GoalList goals={goals ?? []} />
     </>
   );
 }

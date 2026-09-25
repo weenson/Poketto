@@ -1,6 +1,6 @@
 type ButtonProps = {
   children: React.ReactNode;
-  variant: "primary" | "black";
+  variant: "primary" | "black" | "muted";
   size: "lg" | "md" | "sm";
   justify: "center" | "start" | "end";
   disabled?: boolean;
@@ -11,6 +11,7 @@ type ButtonProps = {
 const variantStyles = {
   primary: "bg-primary text-white hover:bg-primary/90 flex items-center",
   black: "bg-black text-white hover:bg-black/90 flex items-center",
+  muted: "bg-muted text-dark hover:bg-muted/90 flex items-center",
 };
 
 const variantSize = {

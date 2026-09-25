@@ -9,7 +9,7 @@ type TransactionsType = {
   amount: number;
   createdAt: Date;
   type: "INCOME" | "EXPENSE";
-  savings: {
+  savings?: {
     id: string;
     title: string;
   } | null;
@@ -66,7 +66,10 @@ export default async function TransactionList({
                   };
 
             return (
-              <div key={item.id} className="mt-4">
+              <div
+                key={item.id}
+                className="mt-4 bg-white rounded-2xl p-4 shadow-sm shadow-primary/20"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="bg-muted p-4 rounded-2xl">
