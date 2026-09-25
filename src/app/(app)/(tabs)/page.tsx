@@ -9,13 +9,14 @@ import { TRANSACTION_ROUTES } from "@/features/transactions/constants";
 import Link from "next/link";
 import { Toaster } from "sonner";
 import SuccessToast from "@/features/home/components/success-toast";
+import GoalCompleteModal from "@/features/home/components/goal-complete-modal";
 
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ success?: string }>;
+  searchParams: Promise<{ success?: string; goalComplete?: string }>;
 }) {
-  const { success } = await searchParams;
+  const { success, goalComplete } = await searchParams;
   const date = new Date();
   const formattedDate = formatDateToText(date);
 
@@ -35,6 +36,7 @@ export default async function Home({
         link={"/"}
         title={"Transaction Saved"}
       />
+      <GoalCompleteModal title={goalComplete} />
       <section>
         <div>
           <p className="text-muted-text text-xs font-bold">{formattedDate}</p>
@@ -60,7 +62,6 @@ export default async function Home({
           </Link>
         </div>
       </section>
-
       <TransactionList transactions={transactions} />
     </div>
   );
