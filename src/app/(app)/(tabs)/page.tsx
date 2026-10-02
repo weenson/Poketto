@@ -62,6 +62,15 @@ export default async function Home({
           </Link>
         </div>
       </section>
+      <div className="flex items-center justify-between mt-4">
+        <p className="text-black font-medium">Recent Transactions</p>
+        <Link
+          href="/transactions/all"
+          className="text-primary text-sm font-bold"
+        >
+          See all
+        </Link>
+      </div>
       <TransactionList transactions={transactions} />
     </div>
   );
