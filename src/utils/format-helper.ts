@@ -1,3 +1,5 @@
+import { TransactionsType } from "@/features/home/components/transaction-list";
+
 export function formatDateToText(date: Date) {
   return date
     .toLocaleDateString("en-US", {
@@ -35,4 +37,22 @@ export function parseAmount(value: string): number | null {
 
 export function percentProgress(a: number, b: number): number {
   return Math.min((a / b) * 100);
+}
+
+export function groupTransactionByMonth(transaction: TransactionsType[]) {
+  const groups = new Map<string, TransactionsType[]>();
+  for (const trans of transaction) {
+    const date = new Date(trans.createdAt);
+    const key = `${date.getFullYear()}-${date.getMonth()}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(trans);
+  }
+  console.log(groups);
+  return [...groups.entries()].map(([, items]) => ({
+    label: new Date(items[0].createdAt).toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric",
+    }),
+    items,
+  }));
 }

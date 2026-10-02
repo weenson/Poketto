@@ -1,5 +1,5 @@
-import { CircleX, TrendingUp, ClockFading } from "lucide-react";
-import { formatAmountCompact, percentProgress } from "@/utils/format-helper";
+import { CircleX } from "lucide-react";
+import { percentProgress } from "@/utils/format-helper";
 import GoalListCard from "./goal-list-card";
 import Link from "next/link";
 
@@ -10,15 +10,12 @@ export type SavingsGoal = {
   currentAmount: number;
   endDate?: Date | null;
   imageUrl?: string | null;
+  status: string;
 };
 
 export default function GoalList({ goals }: { goals: SavingsGoal[] }) {
   return (
     <section className="mt-4">
-      <div className="flex items-center justify-between">
-        <p className="text-black font-medium">My Goals</p>
-        <p className="text-primary text-sm font-bold">See all</p>
-      </div>
       <div>
         {goals.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full py-4 gap-2 max-w-xs mx-auto md:max-w-md md:mx-auto">

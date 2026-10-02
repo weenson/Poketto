@@ -1,12 +1,15 @@
+"use server";
+
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 
-export async function fetchTransaction() {
+export async function fetchTransaction(page: number = 1) {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
 
   return await prisma.transaction.findMany({
     take: 10,
+    skip: (page - 1) * 10,
     where: {
       userId: session.user.id,
     },
