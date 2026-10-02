@@ -47,6 +47,12 @@ export default async function SavingsPage({
           </div>
         </div>
         <HeroCard total={total ?? 0} />
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-black font-medium">My Goals</p>
+          <Link href="/savings/all">
+            <p className="text-primary text-sm font-bold">See all</p>
+          </Link>
+        </div>
         <GoalList goals={goals ?? []} />
       </section>
     </>

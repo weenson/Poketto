@@ -3,19 +3,24 @@
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 
-export async function getSavingsGoals() {
+export async function getSavingsGoals(
+  status: "ACTIVE" | "COMPLETED" = "ACTIVE",
+  page: number = 1,
+) {
   const session = await getSession();
   if (!session) return;
 
   const goals = await prisma.savings.findMany({
     take: 10,
-    where: { userId: session.user.id, status: "ACTIVE" },
+    skip: (page - 1) * 10,
+    where: { userId: session.user.id, status: status },
     select: {
       id: true,
       title: true,
       goalAmount: true,
       endDate: true,
       imageUrl: true,
+      status: true,
     },
   });
 
@@ -46,6 +51,7 @@ export async function getSavingsGoals() {
     currentAmount:
       (incomeById.get(goal.id) ?? 0) - (expenseById.get(goal.id) ?? 0),
     endDate: goal.endDate,
+    status,
   }));
 }
 

@@ -55,7 +55,7 @@ export default function HeroCard({ total }: HeroCardProps) {
               </span>
               {Math.round(
                 percentProgress(total.currentAmount, total.goalAmount),
-              )}
+              ) || 0}
               %
             </p>
             <p className="text-sm text-muted-text">Saving rate</p>

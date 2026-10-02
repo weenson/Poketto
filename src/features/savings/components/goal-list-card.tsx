@@ -3,9 +3,13 @@ import { formatAmountCompact, percentProgress } from "@/utils/format-helper";
 import type { SavingsGoal } from "./goal-list";
 
 export default function GoalListCard({ goal }: { goal: SavingsGoal }) {
-  const progress = percentProgress(goal.currentAmount, goal.goalAmount);
+  const progress = Math.max(
+    0,
+    Math.min(percentProgress(goal.currentAmount, goal.goalAmount), 100),
+  );
   const remainingAmount = goal.goalAmount - goal.currentAmount;
   const remainingAmountVisible = progress >= 90;
+  const status = goal.status;
 
   const today = new Date();
   const remainingDays =
@@ -17,26 +21,27 @@ export default function GoalListCard({ goal }: { goal: SavingsGoal }) {
       : null;
   const remainingDaysVisible = remainingDays != null && remainingDays <= 5;
 
-  const chip = remainingDaysVisible
-    ? {
-        label:
-          remainingDays === 0
-            ? "Due today!"
-            : remainingDays === 1
-              ? "Hurry up..! 1 day left!"
-              : `Hurry up..! ${remainingDays} days left!`,
-        gradient: "from-danger/15 to-danger/0",
-        iconClass: "text-danger",
-        Icon: ClockFading,
-      }
-    : remainingAmountVisible
+  const chip =
+    remainingDaysVisible && status === "ACTIVE"
       ? {
-          label: `Just Rp ${formatAmountCompact(remainingAmount)} to go!`,
-          gradient: "from-primary/15 to-primary/0",
-          iconClass: "text-primary",
-          Icon: TrendingUp,
+          label:
+            remainingDays === 0
+              ? "Due today!"
+              : remainingDays === 1
+                ? "Hurry up..! 1 day left!"
+                : `Hurry up..! ${remainingDays} days left!`,
+          gradient: "from-danger/15 to-danger/0",
+          iconClass: "text-danger",
+          Icon: ClockFading,
         }
-      : null;
+      : remainingAmountVisible && status === "ACTIVE"
+        ? {
+            label: `Just Rp ${formatAmountCompact(remainingAmount)} to go!`,
+            gradient: "from-primary/15 to-primary/0",
+            iconClass: "text-primary",
+            Icon: TrendingUp,
+          }
+        : null;
 
   return (
     <div>
