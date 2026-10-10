@@ -24,6 +24,7 @@ model User {
   accounts      Account[]
   transactions  Transaction[]
   savings       Savings[]
+  budgets       Budget[]
 
   @@map("user")
 }
@@ -122,4 +123,20 @@ model Savings {
 
   @@index([userId])
   @@map("savings")
+}
+
+model Budget {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Int
+  year      Int
+  month     Int
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, year, month])
+  @@index([userId])
+  @@map("budget")
 }
